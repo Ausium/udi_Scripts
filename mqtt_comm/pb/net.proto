@@ -1,0 +1,918 @@
+syntax = "proto3";
+// import "google/protobuf/wrappers.proto";
+option go_package = "./";
+package Net;
+
+message Header {
+  uint32 class_id = 1;
+  fixed64 car_id = 2;
+}
+
+message Message {
+  uint32 class_id = 1;
+}
+
+message RegisterRequest {
+  uint32 class_id = 1;
+  message Payload {
+    bytes car_type = 1;
+    bytes register_code = 2;
+  }
+  Payload payload = 2;
+  bytes car_id = 3;
+}
+
+// 登入请求　ID:２
+// 车端->网端
+// sign按位标识: bit0:新版任务 bit1:开机自检 bit2:卷帘门 bit3:电控门 bit4:传输装置
+message LoginRequest {
+  uint32 class_id = 1;
+  message Payload {
+    bytes login_reason = 1;
+    bytes task_id = 2;
+    int64 sign = 3;                                                             // 车端功能集标志位
+    int64 timestamp = 4;                                                        // 车端操作系统时间戳,10位,精确到秒
+
+  }
+  Payload payload = 2;
+  bytes car_id = 3;
+}
+
+message Heartbeat {
+  uint32 class_id = 1;
+  message Payload {
+    bytes live_state = 1;
+  }
+  Payload payload = 2;
+  bytes car_id = 3;
+}
+
+//case: 6
+//carlog
+message StateReport {
+  uint32 class_id = 1;
+  message Payload {
+    uint32 check_state = 1;
+    uint32 hardwire_state = 2;
+    uint32 driving_state = 3;
+    double longitude = 4;//double TODO:
+    double latitude = 5;//double TODO:
+    float speed = 6;
+    float mileage = 7;
+    uint32 battery = 8;
+    float voltage = 9;
+    float current = 10;
+    float average_temperature = 11;
+    float max_cell_temperature = 12;
+    float min_cell_temperature = 13;
+    float max_cell_voltage = 14;
+    float min_cell_voltage = 15;
+    bytes local_task_id = 16;
+    bytes platform_task_id = 17;
+    bool carlock_status = 18;
+    float rest_distance = 19;
+    bool charging_status = 20;
+    uint32 turn_light = 21; //0:关 1：左转向 2：右转向 3：双闪
+    uint32 curtained_door = 22;
+    uint32 cargo_rear = 23;
+    uint32 cargo_front = 24;
+    //新增
+    double x = 25;
+    double y = 26;
+    //自动扫描
+    bool auto_scan = 27;
+    //警灯状态
+    bool warn_light_status = 28;
+    //消杀状态
+    bool disinfection_status = 29;
+    //摄像机状态
+    // bool camera_status = 30;
+    //液位余量
+    uint32 liquid_level = 31;
+    //喇叭状态 id
+    string audio_id = 32;
+    //录音播放进度 第几次
+    uint32 audio_progress = 33;
+    //当前正在巡航的路线名称
+    uint32 cruise_name = 34;
+    uint32 capture_pattern = 35;//车牌识别为1; 人脸抓拍为2; 不识别为3
+    bool is_camera_on = 36;//是否开启摄像
+    bool is_localrecord = 37;//是否开启本地录像存储
+    bool low_beam_status = 38;
+    uint32 mode = 39; // 1:自动模式;2:手动模式;3:远程模式
+    bool push_status = 40; //推流状态
+    CabinetState cabinet_state = 41;//货柜门状态
+    uint64 sign = 42; // sign按位标识: bit0:新版任务 bit1:开机自检 bit2:卷帘门 bit3:电控门 bit4:传输装置 bit5: 按钮反馈
+
+  }
+  Payload payload = 2;
+  bytes car_id = 3;
+  int64 timestamp = 4;
+}
+
+message StartTask {
+  uint32 class_id = 1;
+  message Payload {
+    bytes task_id = 1;
+    fixed64 start_time = 2;
+    uint32 task_type = 3;
+  }
+  Payload payload = 2;
+  bytes car_id = 3;
+}
+
+message EndTask {
+  uint32 class_id = 1;
+  message Payload {
+    uint32 end_type = 1;
+    uint32 end_reason = 2;
+    bytes task_id = 3;
+    fixed64 end_time = 4;
+    uint32 task_type = 5;
+  }
+  Payload payload = 2;
+  bytes car_id = 3;
+}
+
+message TakeOverReport {
+  uint32 class_id = 1;
+  message Payload {
+    bytes takeover_type = 1;
+    bytes local_task_id = 2;
+    bytes platform_task_id = 3;
+    uint32 check_state = 4;
+    double longitude = 5;
+    double latitude = 6;
+  }
+  Payload payload = 2;
+  bytes car_id = 3;
+}
+
+message CheckReport {
+  uint32 class_id = 1;
+  message Payload {
+    bytes check_result = 1;
+    uint32 hardwire_state = 2;
+    uint32 battery = 3;
+    double longitude = 4;
+    double latitude = 5;
+  }
+  Payload payload = 2;
+  bytes car_id = 3;
+}
+
+message LogoutRequest {
+  uint32 class_id = 1;
+  message Payload {
+    bytes logout_reason = 1;
+  }
+  Payload payload = 2;
+  bytes car_id = 3;
+}
+
+message DrivingWarn {
+  uint32 class_id = 1;
+  message Payload {
+    uint32 check_state = 1;
+    uint32 driving_state = 2;
+    uint32 error_level = 3;
+  }
+  Payload payload = 2;
+  bytes car_id = 3;
+}
+
+message HardwareWarn {
+  uint32 class_id = 1;
+  message Payload {
+    uint32 check_state = 1;
+    uint32 hardwire_state = 2;
+    uint32 error_level = 3;
+  }
+  Payload payload = 2;
+  bytes car_id = 3;
+}
+
+message PlannedRoute {
+  uint32 class_id = 1;
+  message Payload {
+    bytes local_task_id = 1;
+    bytes platform_task_id = 2;
+    uint32 count = 3;
+    message RouteNode {
+      double longitude = 1;
+      double latitude = 2;
+      uint32 rank_no = 3;
+    };
+    repeated RouteNode nodes = 4;
+    uint32 task_type = 5;
+    float rest_distance = 6;
+  }
+  Payload payload = 2;
+  bytes car_id = 3;
+}
+
+message TaskCmd {
+  uint32 class_id = 1;
+  message Payload {
+    uint32 task_type = 1;
+    bytes task_id = 2;
+    uint32 start_point = 3;
+    uint32 destination = 4;
+    double x = 5;
+    double y = 6;
+    double z = 9;
+    double yaw = 7;
+    string destination_name = 8;
+    bytes main_task_id = 10;
+    int64 stopping_time = 11;//任务到站后的停靠时间(秒)  -1表示长时间停靠
+  }
+  Payload payload = 2;
+}
+
+// 车端任务接受确认反馈网端 ID:8
+// 车端->网端
+// 需要时请求
+// 新版任务网端下发主任务时 车端只返回一次
+message TaskCmdResponse {
+  uint32 class_id = 1;
+  message Payload {
+    bytes task_id = 1;                                                          // 子任务ID,task_type>=100时为主任务id
+    bytes result = 2;                                                           // 接收结果 1:接收成功 非1:接收失败
+    bytes refuse_reason = 3;                                                    // 拒绝执行原因 新版任务拒绝执行的情况只有:1(网端下发的任务指令过期) 0:路径规划失败
+    uint32 task_type = 4;                                                       // 任务类型(新增)，与网段下发的TaskCmd对应，0:通用任务 1:配送任务 2:召回任务 3:清扫任务 100:新版通用任务
+    int64 timestamp = 5;                                                        // 消息时间戳 10位 精确到秒 根据时间差校正后的时间
+    uint32 global_plan_failed_reason = 6;                                       // 上报路径规划失败的原因，当refuse_reason为0且result非1时生效，1：目标点下发后接收全局规划反馈超时，2：规控主动上报全局规划失败
+  }
+  Payload payload = 2;
+  bytes car_id = 3;                                                             // 车辆ID
+}
+
+
+message CancelCmd {
+  uint32 class_id = 1;
+  message Payload {
+    uint32 cancel_type = 1;
+    bytes task_id = 2;
+    uint32 task_type = 3;                                                       // 任务类型(新增)，与网段下发的TaskCmd对应，0:通用任务 1:配送任务 2:召回任务 3:清扫任务 100:新版通用任务
+    int64 expire = 4;                                                           // 指令有效期, 单位为秒, -1表示车端收到该指令无需判断有效期即可执行
+    int64 timestamp = 5;                                                        // 网端消息时间戳 10位 精确到秒
+    bytes req_command_id = 6;
+  }
+  Payload payload = 2;
+}
+
+message ACK {
+  uint32 class_id = 1;
+  message Payload {
+    bytes result = 1;
+    int64 timestamp_delta = 2;                                                  // 网端时间-车端时间(不包括网络传输延时)
+  }
+  Payload payload = 2;
+  bytes car_id = 3;
+}
+
+message LockCmd {
+  uint32 class_id = 1;
+  message Payload {
+    bytes req_command_id = 1;       //web请求操作 uuid
+    string operation_id = 2;        // 操作ID，车辆编号加时间
+    uint32 accessory_type = 3;      //控制附件的类型 ;0电控门,1卷帘门,
+    uint32 accessory_id = 4;        //要控制的附件id，从0开始
+    uint32 control_operation = 5;   // 对应控制操作;0 开启,1 关闭,2 停止
+  }
+  Payload payload = 2;
+}
+
+message RemoteControl {
+  uint32 class_id = 1;
+  message Payload {
+    bool operation = 1;
+    bytes req_command_id = 2;
+    string reason = 3;                                                            // 附加字段  文字说明.
+  }
+  Payload payload = 2;
+}
+
+//id 20
+message Msg_ACK {
+  uint32 class_id = 1;
+  message Payload {
+    uint32 ack_class_id = 1;
+    bytes result = 2;
+  }
+  Payload payload = 2;
+  bytes car_id = 3;
+}
+
+// id 21
+message RoadBlockCmd {
+  uint32 class_id = 1;
+  message Payload {
+    bool operation = 1;
+    message RoadBlock {
+      int64 id = 1;
+      double longitude = 2;
+      double latitude = 3;
+    }
+    repeated RoadBlock roadblocks = 2;
+  }
+  Payload payload = 2;
+}
+
+message ErrWarn {
+  uint32 class_id = 1;
+  message Payload {
+    message ErrCode {
+      string code = 1;
+      string detail = 2;
+    }
+    repeated ErrCode nodes = 1;
+  }
+  Payload payload = 2;
+  bytes car_id = 3;
+}
+
+// 车辆标准配置控制指令 ID可变
+// 网端->车端
+// 需要时请求
+// id:16 远程 暂停/继续 任务，操作类型：type=0: 暂停;type=1: 继续
+// id:17 远程 开/关 灯，操作类型：type=0: 关;type=1: 开;type=2: 切自动
+// id:18 远程 开/关 鸣笛，操作类型：type=1: 触发一次
+// id:44 清零小计里程，操作类型：type=1: 触发一次
+// id:60 开始人工自检，操作类型：type=1: 触发一次
+// id:61 视同到达指令
+// id:62 停靠结束指令
+// id:66 延迟5分钟指令
+// id:67 修改当前车辆昵称
+// id:68 重新规划
+message Operation {    //兼容旧版
+  uint32 class_id = 1;
+  message Payload {
+    int32 type = 1;                                                             // 操作类型
+    bytes task_id = 2;                                                          // 当前子任务id（预留）
+    bytes req_command_id = 3;                                                   // 操作ID uuid
+    int64 expire = 4;                                                           // 指令有效期, 单位为秒, -1表示车端收到该指令无需判断有效期即可执行
+    int64 timestamp = 5;                                                        // 消息时间戳 10位 精确到秒
+    repeated int32 enable_control_mode = 6;                                     // 该指令在哪些模式下使能，默认留空表示该指令在所有模式都使能
+                                                                                // 0 现场人工驾驶模式（仅在载人车上使用）
+                                                                                // 1 现场VCU遥控模式
+                                                                                // 2 VCU空闲模式
+                                                                                // 3 现场IPC遥控模式
+                                                                                // 4 IPC手动遥控脱困
+                                                                                // 5 IPC网端远程驾驶模式
+                                                                                // 6 IPC网端脱困模式
+                                                                                // 7 IPC自动驾驶模式
+                                                                                // 8 IPC空闲模式
+    string operation_string = 7;                                                // 网端操作字符串，当前仅供昵称使用
+  }
+  Payload payload = 2;
+}
+
+// id:25
+// event: 1 卷帘门开启
+//        2 卷帘门关闭
+//        3 传送带上货
+//        4 传送带下货
+// type:  1 开始
+//        2 结束
+message ControlReport {
+  uint32 class_id = 1;
+  message Payload {
+    bytes task_id = 1;
+    uint32 event = 2;
+    uint32 type = 3;
+  }
+  Payload payload = 2;
+  bytes car_id = 3;
+}
+
+//id:26 请求消息的字段
+//event:车辆下发的上报软件信息通知
+//bool:true上报，false不上报
+message AppInfoCmd{
+  uint32 class_id = 1;
+  message Payload{
+    bool operation = 1;
+  }
+  Payload payload = 2;
+}
+
+//id:26 应答消息的字段
+message AppInfoReport{
+  uint32 class_id = 1;
+  message Softwares{
+    uint32 count = 1;
+    message SoftwaresNode{
+      string name = 1;
+      string version = 2;
+    }
+    //将RouteNode作为成员，才可以存储此类对象
+    //作为repeated成员，可以作为数组成员
+    repeated SoftwaresNode nodes = 2;
+  }
+  Softwares softwares = 2;//将Softwares作为成员，才可以存储此类对象
+}
+
+//id:27 请求消息的字段
+//event:接收后台下发的对app安装、更新、删除等操作指令
+//bool:true上报，false不上报
+message AppInstallCmd{
+  uint32 class_id = 1;
+  message Items{
+    uint32 count = 1;
+    message ItemsNode{
+      string id = 1;//车辆软件或配置唯一标识
+      bool is_soft = 2;//是否为软件
+      uint32 operation = 3;//1安装，2升级，3卸载
+      string conf_name = 4;//配置名称
+      string text = 5;//配置内容
+      string soft_name = 6;//软件名称
+      string identity = 7;//版本标识，指软件版本好或配置哈希值
+    };
+    repeated ItemsNode nodes = 2;
+  }
+  Items items = 2;
+}
+
+//id:27 应答消息的字段
+message AppInstallReport{
+  uint32 class_id = 1;
+  message Items{
+    uint32  count = 1;
+    message ItemsNode{
+      string id = 1;//车辆软件或配置唯一标识
+      bool is_soft = 2;//是否为软件
+      uint32 operation = 3;//安装1，升级2，卸载3
+      bool ok = 4;//是否执行成功
+      string reason = 5;//失败原因
+      string identity = 6;
+    };
+    repeated ItemsNode nodes = 2;
+  }
+  Items items = 2;
+}
+
+// id: 28 移动云台
+// value:   11 焦距变大
+//          12 焦距变小
+//          21 上
+//          22 下
+//          23 左
+//          24 右
+//          25 上左
+//          26 上右
+//          27 下左
+//          28 下右
+//          29 左右自动扫描
+// speed:  移动速度 1-7 默认 1
+// status: 0:启动 1:停止
+// result:(车端返回 仅当value=29时有效)
+message ManualControl {
+  uint32 class_id = 1;
+  message Payload {
+    uint32 value = 1;
+    uint32 speed = 2;
+    uint32  status = 3;
+    bool  result = 4;
+    bytes req_command_id = 5;
+  }
+  Payload payload = 2;
+}
+
+// id:29        预置位操作
+// name:        预置位名称
+// operation: 8 添加预置位
+//            9 删除预置位
+//           39 移动到该预置位
+// result:(车端返回) true 成功 false 失败
+message PresetPosition {
+  uint32 class_id = 1;
+  message Payload {
+    uint32 name = 1;
+    uint32 operation = 2;
+    bool   result = 3;
+    bytes req_command_id = 4;
+  }
+  Payload payload = 2;
+}
+
+// id: 30 云台巡航操作
+// cmd: 30 将预置点加入巡航序列
+//      31 设置巡航点停顿时间
+//      32 设置巡航速度
+//      33 将预置点从巡航序列中删除
+//      37 开始巡航
+//      38 停止巡航
+// route: 巡航路径
+// point: 巡航点 / 时间
+// speed: 速度
+// result:(车端返回) true 成功 false 失败
+message Cruise {
+  uint32 class_id = 1;
+  message Payload {
+    uint32 cmd = 1;
+    uint32 route = 2;
+    uint32 point = 3;
+    uint32 speed = 4;
+    bool result = 5;
+    bytes req_command_id = 6;
+  }
+  Payload payload = 2;
+}
+
+// id: 31 警灯控制
+//     32 消杀控制
+//     40 摄像开启关闭控制
+//     42 本地录像关闭控制
+// operate: true 开启 false 关闭
+// result:(车端返回) true 成功 false 失败
+message CarControl {
+  uint32 class_id = 1;
+  message Payload {
+    bool operate = 1;
+    bool result = 2;
+    bytes req_command_id = 3;
+  }
+  Payload payload = 2;
+}
+
+// id: 33 喇叭控制
+// audioID:  录音id
+// md5:      录音文件MD5
+// times:    播放次数
+// interval: 播放间隔
+// operate:  true 开启 false 关闭
+// result:(车端返回) true 成功 false 失败
+// seconds:  播放时长(秒)
+message Audio {
+  uint32 class_id = 1;
+  message Payload {
+    string audioID = 1;
+    string md5 = 2;
+    uint32 times = 3;
+    uint32 interval = 4;
+    bool operate = 5;
+    bool result = 6;
+    double seconds = 7;
+  }
+  Payload payload = 2;
+}
+
+// id:35
+// blacklpn 黑名单车牌号请求
+message BlackLpnCmd{
+  uint32 class_id = 1;
+  uint32 count = 2;
+  message Items{
+    bytes id = 1;         // 车辆黑名单车牌号唯一标识
+    uint32 operation = 2;  // 设置黑名单为 1，设置白名单为 2
+    bytes lpn = 3;        // 车牌号
+  };
+  repeated Items items = 3;
+}
+
+// blacklpn 黑名单车牌号应答
+message BlackLpnCmdResponse{
+  uint32 class_id = 1;
+  uint32 count = 2;
+  message Items{
+    bytes id = 1;         // 车辆黑名单车牌号唯一标识
+    uint32 operation = 2;  // 设置黑名单为 1，设置白名单为 2
+    bool ok = 3;           // 是否成功
+  };
+  repeated Items items = 3;
+}
+
+// id:36
+// AlarmMenuReport 一键求助报警上报
+message AlarmMenuReport{
+  uint32 class_id = 1;
+  message Payload {
+    fixed64 alarm_time = 1;
+    message GPS {
+      double longitude = 1;
+      double latitude = 2;
+    };
+    GPS gps = 2;
+  };
+  Payload payload = 2;
+}
+
+// id:37
+// AlarmBlackLpnReport 黑名单车牌号报警上报
+// message AlarmBlackLpnReport{
+//    uint32 class_id = 1;
+//    message Payload {
+//       bytes lpn = 1;        // 车牌号
+//       message GPS {
+//           double longitude = 1;
+//           double latitude = 2;
+//       };
+//       GPS gps = 2;
+//    };
+//    Payload payload = 2;
+// }
+
+// id:38
+// SwitchCapturePatternCmd 下发切换识别模式请求
+message SwitchCapturePatternCmd {
+  uint32 class_id = 1;
+  message Payload {
+    bytes id = 1;
+    uint32 type = 2;
+  };
+  Payload payload = 2;
+}
+
+// SwitchCapturePatternCmdResponse 下发切换识别模式应答
+message SwitchCapturePatternCmdResponse {
+  uint32 class_id = 1;
+  message Payload {
+    bytes id = 1;
+    uint32 type = 2;
+    bool ok = 3;
+  };
+  Payload payload = 2;
+}
+
+// id:39
+// CaptureCmd 下发立即抓拍指令
+message CaptureCmd{
+  uint32 class_id = 1;
+}
+
+// id:41
+// CaptureNotify 抓拍图片通知前端
+message CaptureNotify{
+  uint32 class_id = 1;
+  message Payload {
+    uint32 type = 1;
+    bytes name = 2;
+    bytes object = 3;
+    bool isblacklpn = 4;
+  };
+  Payload payload = 2;
+}
+
+// id:43
+// AliyunAuthInfo 下发阿里云权限信息
+message AliyunAuthInfo{
+  uint32 class_id = 1;
+  message Payload {
+    uint32 operation = 1;
+    bytes rtmp = 2;
+    bytes ossinfo = 3;
+    bytes nonce = 4;
+  };
+  Payload payload = 2;
+}
+
+message StationRoute {
+  int64 id = 1;
+  bytes name = 2;
+  bytes area = 3;
+  double longitude = 4;
+  double latitude = 5;
+  double x = 6;
+  double y = 7;
+  double z = 8;
+  double yaw = 9;
+}
+
+// id:47
+// RouteWayInfo 下发车辆途径点信息
+message RouteWayInfo{
+  uint32 class_id = 1;
+  message Payload {
+    repeated StationRoute routes = 1;
+  };
+  Payload payload = 2;
+}
+
+
+// id:49
+// RouteWayInfo 车辆途径点上报
+message RouteWayReport{
+  uint32 class_id = 1;
+  message Payload {
+    bytes task_id = 1;
+  };
+  Payload payload = 2;
+}
+
+// id:50
+// CarConfig 车辆用途等信息
+message CarConfig{
+  uint32 class_id = 1;
+  message Payload {
+    bytes area = 1; //园区id
+    bytes usage_state = 2; //1、生产 2、测试 3、试用 4、运营 5、停用 6、闲置
+  };
+  Payload payload = 2;
+}
+
+// id:51
+// StateChange 车辆上下线消息
+message StateChange{
+  uint32 class_id = 1;
+  message Payload {
+    string area = 1; //园区id
+    string car_id = 2; //车辆id
+    uint32 state = 3; //1.online 2.offline
+  };
+  Payload payload = 2;
+}
+
+//class_id=52
+message ECDState {
+  uint32 class_id = 1;
+  message Payload {
+    message SingleCabinet{
+      uint32 id = 1;  //柜子id,从0开始
+      uint32 lock_status = 2;//锁状态 1关0开
+      uint32 door_status = 3;//门状态 1关0开
+    };
+    repeated SingleCabinet cabinets = 1;
+  }
+  Payload payload = 2;
+}
+
+
+/*------------------------------　网端->车端　------------------------------*/
+// 选配附件操作指令(卷帘门、电控门、华为传输装置)　ID:52
+// 网端->车端
+// 需要时请求
+message CabinetControl {
+  uint32 class_id = 1;
+  message Payload {
+    bytes req_command_id = 1;                                                   // web请求操作 uuid
+    string operation_id = 2;                                                    // 操作ID(预留，暂时不用)，车辆编号加时间戳(毫秒级)  例: adv-gt-43_1623232323232
+    uint32 accessory_type = 3;                                                  // 控制附件的类型;0电控门,1卷帘门
+    uint32 accessory_id = 4;                                                    // 要控制的附件id，从0开始(需确定对应机制)
+    uint32 control_operation = 5;                                               // 对应控制操作;0 开启,1 关闭,2 停止
+    int64 expire = 6;                                                           // 指令有效期, 单位为秒, -1表示车端收到该指令无需判断有效期即可执行
+    int64 timestamp = 7;                                                        // 消息时间戳 10位 精确到秒
+    repeated int32 enable_control_mode = 8;                                     // 该指令在哪些模式下使能，默认留空表示该指令在所有模式都使能
+    // 0 现场人工驾驶模式（仅在载人车上使用）
+    // 1 现场VCU遥控模式
+    // 2 VCU空闲模式
+    // 3 IPC遥控模式
+    // 4 IPC遥控脱困模式
+    // 5 IPC网端远程驾驶模式
+    // 6 IPC网端脱困模式
+    // 7 IPC自动驾驶模式
+    // 8 IPC空闲模式
+
+  }
+  Payload payload = 2;
+}
+
+
+message CabinetState {
+  uint32 class_id = 1; //class_id
+  //电控门
+  message ElectricDoorObject{
+    uint32 door_id = 1;  //柜子id,从0开始
+    uint32 lock_status = 2;//锁状态 1 未锁 0 已锁
+    uint32 door_status = 3;//门状态 1关0开
+  };
+  //卷帘门
+  message RollerDoorObject{
+    uint32 door_id = 1;  //卷帘门id
+    uint32 door_status = 2;  // 卷帘门状态;0停止,1关到位,2开到位,3开关过程中,4故障,5 急停按下（预留）,6防夹保护触发停止（预留）
+  };
+  message Payload {
+    uint32 electric_door_num = 1;  //车辆电控门数量，0表示没有
+    repeated ElectricDoorObject eclectic_doors_status = 2;//车辆所有电控门状态
+    uint32 roller_door_num = 3;    //车辆卷帘门数量，0表示没有
+    repeated RollerDoorObject roller_doors_status = 4; //车辆所有卷帘门状态
+  }
+  Payload payload = 2;
+}
+
+
+// 根据任务类型判断时上货/下货 传输装置控制 网端->车端 ID: 58
+message TransportControl{
+  uint32 class_id = 1;
+  message Payload {
+    bytes req_command_id = 1;       //web请求操作 uuid
+    uint32 operation_type = 2;        // 对应控制操作: 1上货　２下货
+    uint32 cargo_number = 3;          // 货物数量 默认为4
+    string task_id = 4;             // 主任务id
+  }
+  Payload payload = 2;
+}
+
+//远程控制反馈 车端->网端 ID:58
+message TransportControlResp {
+  uint32 class_id = 1;
+  message Payload {
+    bool operation_result = 1;  //操作是否成功
+    uint32 operation_type = 2;    // 对应控制操作: 1上货　２下货  3自动充电
+    bytes req_command_id = 3;   //uuid
+    string reason = 4;            //附加字段  文字说明.
+    string task_id = 5;           // 主任务id
+  }
+  Payload payload = 2;
+}
+
+// 车端自检报告　ID:59
+// 车端->网端
+// 需要时请求
+message SelfCheckReport {
+  uint32 class_id = 1;
+  message Payload {
+    uint32 chassis_control_mode_code = 1;                                        // 自检时车辆模式, 0 现场人工驾驶模式, 1 现场VCU遥控模式,
+    // 2 VCU空闲模式, 3 现场IPC遥控模式, 4 遥控脱困模式,
+    // 5 网端远程驾驶模式, 6 网端脱困模式, 7 自动驾驶模式, 8 IPC空闲模式
+    int64 check_start_time = 2;                                                // 自检开始时间时间戳, 精确到秒
+    int64 check_end_time = 3;                                                  // 自检结束时间时间戳, 精确到秒
+    uint32 check_type = 4;                                                      // 自检类型，1 开机时自检, 2 人为触发自检, 3 进入IPC自动模式时自检
+    string req_command_id = 5;                                                  // 人为触发自检命令的uuid，仅在自检类型为人为触发自检时赋值
+    bool command_sta = 6;                                                        // 人为触发自检命令执行状态（预留），0　正在执行开机自检，未执行人工自检，1　已执行
+    bool check_sta = 7;                                                          // 总自检结果，底下所有自检结果与运算,　0 总自检不通过, 1　自检通过
+    bool software_startup_sta = 8;                                              // 程序启动状态自检结果，　0 程序启动状态自检不通过, 1　自检通过
+    bool hardware_sta = 9;                                                      // 硬件状态自检结果，　0 硬件状态自检不通过, 1　自检通过
+    bool system_sta = 10;                                                        // 系统状态自检结果，　0 系统状态自检不通过, 1　自检通过
+    bool algo_sta = 11;                                                          // 算法状态自检结果，　0 算法状态自检不通过, 1　自检通过
+    bool mode_sta = 12;                                                          // 自检过程中模式状态，　0 模式变化导致自检不通过，1　自检通过
+    message UnifiedErrorCode
+    {
+      bytes error_code = 1;                                                      // 故障码字符串
+      uint32 error_rank = 2;                                                    // 故障码等级
+    }
+    repeated UnifiedErrorCode error_codes = 13;                                  // 自检过程中出现过的所有故障码
+  }
+  Payload payload = 2;
+}
+
+// 通用车端对网端下发附件和功能控制指令的结果反馈 ID可变
+// 车端->网端
+// 需要时请求
+// id:16 远程 暂停/继续 任务，操作类型：type=0: 暂停;type=1: 继续
+// id:17 远程 开/关 灯，操作类型：type=0: 关;type=1: 开;type=2: 切自动
+// id:18 远程 开/关 鸣笛，操作类型：type=1: 触发一次
+// id:44 清零小计里程，操作类型：type=1: 触发一次
+message OperationResp {//兼容旧版
+  uint32 class_id = 1;
+  message Payload {
+    int32 type = 1;                                                            // 操作类型
+    bytes task_id = 2;                                                          // 当前自动驾驶任务id（预留）
+    bytes req_command_id = 3;                                                   // 操作ID uuid
+    bool operation_result = 4;                                                  // 操作是否成功
+    string reason = 5;                                                          // 操作失败的文字说明，操作成功可不发
+    int64 timestamp = 6;                                                        // 消息时间戳 10位 精确到秒 根据时间差校正后的时间
+    int64 failure_code = 7;                                                     // 失败返回码，1 超时， 2 重复发送，3 指令無效，4 执行失败
+  }
+  Payload payload = 2;
+}
+
+
+
+// 任务事件(新增)
+// 车端->网端
+// 需要时请求
+// id:63
+message TaskEvent {
+  uint32 class_id = 1;
+  message Payload {
+    int32 type = 1;                                                             // 事件类型 1:泊出 2:泊入 3:精准对接 4:到达站点
+    int32 state = 2;                                                            // 事件状态 1:开始 2:成功完成 3:失败
+    int64 timestamp = 3;                                                        // 消息时间戳 10位 精确到秒 根据时间差校正后的时间
+    bytes task_id = 4;                                                          // 子任务id
+  }
+  Payload payload = 2;
+}
+
+
+// 车辆重连时上报任务状态(新增) ID:65
+// 车端->网端
+// 需要时请求
+message SyncTask {
+  uint32 class_id = 1;
+  message SubTask {
+    bytes sub_task_id = 1;                                                      // 子任务id
+    uint32 sub_task_status = 2;                                                 // 子任务状态 0:未开始 1:行驶中 2:泊出中 3:泊入中 4:精准对接中 5:停靠中 6:已完成 7:已取消
+    int64 timestamp = 3;                                                        // 子任务状态变更时间 10位 精确到秒 根据时间差校正后的时间
+    int64 task_event = 4;                                                       // 子任务异常事件 0:无异常 1:子任务规划失败
+  }
+  message Payload {
+    bytes main_task_id=1;                                                       // 主任务ID
+    uint32 main_task_status = 2;                                                // 主任务状态 1:待安排2:待执行3:执行中4:已完成5:已取消
+    int64 timestamp = 3;                                                        // 消息时间戳 10位 精确到秒 根据时间差校正后的时间
+    repeated SubTask sub_task = 4;                                              // 子任务信息
+    uint64 sync_status = 5;                                                     // 1 硬件重启同步状态；2 软件重启同步状态；3 断网重连同步状态
+    bool sync_result = 6;                                                       // 自恢复同步结果， true 同步正常，false 同步异常
+  }
+  Payload payload = 2;
+}
+
+
+
+
+
+
+
+
+
+

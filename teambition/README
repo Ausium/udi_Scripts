@@ -1,0 +1,10 @@
+调用teambition的api接口获取任务数据，再对数据进行处理只展示网端的缺陷数据，绘制成图形。
+chart_config.json是图表的布局配置文件
+index.html是最终的展示图形
+temp.html是原始的图形
+
+tb的接口文档地址：https://open.teambition.com/docs/apis/6321c6cd912d20d3b5a4884b
+
+async_tb_task.py: tb的缺陷曲线图，运行在10.10.10.35服务器上
+to_mail_tb_bug.py: tb的缺陷统计脚本，目前运行在backend2服务器上
+to_mail_tb_need.py: tb的需求和迭代统计脚本，目前运行在backend2服务器上

@@ -1,0 +1,7 @@
+一个简单的web服务，为了解决DNS缓存的问题，阿里云的域名解析修改后不会立即生效，需要等待一段时间，这个时间gitlab就访问不了，所以我就写了个简单的web服务，提供IP查询
+curl http://127.0.0.1:8888  这个返回请求的IP，如果通过外网放回则返回外网IP
+curl http://127.0.0.1:8888?type=udi01  这个返回公司出口IP之一,对应域名udi01.pivp.vip
+curl http://127.0.0.1:8888?type=udi02  这个返回公司出口IP之一,对应域名ddns.unity-drive.net
+curl -X POST http://127.0.0.1:8888?type=udi01 -d '{"IP": "192.168.19.97"}' -H 'Content-Type:application/json'  修改udi01的IP
+curl -X POST http://127.0.0.1:8888?type=udi02 -d '{"IP": "192.168.19.97"}' -H 'Content-Type:application/json'  修改udi02的IP
+POST请求不传type参数返回请求IP, 不传json数据或者header则报错

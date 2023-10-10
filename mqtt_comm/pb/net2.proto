@@ -1,0 +1,130 @@
+syntax = "proto3";
+option go_package = "msg/net";
+package Net;
+
+message CarData {
+    uint32 class_id = 1;
+    message Payload {
+        uint32 chassis_version = 1;
+        message BoolWithCheck
+        {
+            bool data=1;
+            bool is_valid=2;
+        }
+        message  Uint8WithCheck
+        {
+            uint32 data=1;
+            bool  is_valid=2;
+        }
+        message Float32WithCheck
+        {
+            float data=1;
+            bool is_valid=2;
+        }
+        message Float64WithCheck
+        {
+            double data=1;
+            bool is_valid=2;
+        }
+        message DrivingCmd
+        {
+            Uint8WithCheck chassis_control_mode_code=1;
+            repeated uint32 chassis_control_mode_array=2;
+            Float32WithCheck speed_cmd=3;
+            Float32WithCheck steering_degree_cmd=4;
+            Float32WithCheck brake_pressure_cmd=5;
+            Float32WithCheck motor_rpm_cmd=6;
+            repeated  Float32WithCheck data_reserved_float=7;
+            repeated Uint8WithCheck data_reserved_int=8;
+        }
+        message DrivingStatus
+        {
+            BoolWithCheck epb_status=1;
+            Uint8WithCheck system_error_status=2;
+            Uint8WithCheck gear_status=3;
+            Float32WithCheck speed_feedback=4;
+            Float32WithCheck steering_degree_feedback=5;
+            Float32WithCheck brake_pressure_feedback=6;
+            Float32WithCheck back_left_wheel_speed_feedback=7;
+            Float32WithCheck back_right_wheel_speed_feedback=8;
+            Float32WithCheck motor_rpm_feedback=9;
+            Float32WithCheck motor_torque_feedback=10;
+            repeated Float32WithCheck data_reserved_float=11;
+            repeated Uint8WithCheck data_reserved_int=12;
+        }
+        message ChassisStatus
+        {
+            BoolWithCheck high_beam=1;
+            BoolWithCheck low_beam=2;
+            BoolWithCheck driving_lamp=3;
+            BoolWithCheck brake_lamp=4;
+            BoolWithCheck back_driving_lamp=5;
+            BoolWithCheck outline_marker_lamp=6;
+            BoolWithCheck turn_left_lamp=7;
+            BoolWithCheck turn_right_lamp=8;
+            Float32WithCheck odometer=9;
+            Float32WithCheck  tripmeter=10;
+            Float32WithCheck left_front_tire_pressure=11;
+            Float32WithCheck right_front_tire_pressure=12;
+            Float32WithCheck left_rear_tire_pressure=13;
+            Float32WithCheck right_rear_tire_pressure=14;
+            Float32WithCheck left_front_tire_temperature=15;
+            Float32WithCheck right_front_tire_temperature=16;
+            Float32WithCheck left_rear_tire_temperature=17;
+            Float32WithCheck right_rear_tire_temperature=18;
+            repeated Float32WithCheck data_reserved_float=19;
+            repeated Uint8WithCheck data_reserved_int=20;
+        }
+        message PowerSystem
+        {
+            BoolWithCheck charge_status=1;
+            BoolWithCheck charge_wire_status=2;
+            Float32WithCheck battery_soc=3;
+            Float32WithCheck battery_voltage=4;
+            Float32WithCheck battery_current=5;
+            Float32WithCheck charger_output_voltage=6;
+            Float32WithCheck charger_output_current=7;
+            repeated Float32WithCheck data_reserved_float=8;
+            repeated Uint8WithCheck data_reserved_int=9;
+        }
+        message GpsData
+        {
+            BoolWithCheck gps_fix_status=1;
+            Float64WithCheck latitude=2;
+            Float64WithCheck longitude=3;
+            Float64WithCheck altitude=4;
+            Float64WithCheck heading_degree=5;
+            repeated Float32WithCheck data_reserved_float=6;
+            repeated Uint8WithCheck data_reserved_int=7;
+        }
+        message UnifiedErrorCode
+        {
+            bytes error_code=1;
+            uint32 error_rank=2;
+        }
+        message LocationData
+        {
+            BoolWithCheck is_location_data_valid=1;                             // 定位反馈数据是否有效
+            Float64WithCheck latitude=2;                                        // 经度
+            Float64WithCheck longitude=3;                                       // 纬度
+            Float64WithCheck altitude=4;                                        // 海拔高度
+            Float64WithCheck heading_degree=5;                                  // 朝向（方位角） uint: °，正北0度，正东90度
+            repeated Float32WithCheck data_reserved_float=6;                    // reserved
+            repeated Uint8WithCheck data_reserved_int=7;                        // reserved
+        }
+        DrivingCmd driving_cmd = 2;
+        DrivingStatus driving_status=3;
+        ChassisStatus chassis_status=4;
+        PowerSystem power_system_status=5;
+        GpsData gps_data=6;
+        repeated UnifiedErrorCode error_codes=7;
+        bool is_hardware_error_codes_valid=8;
+        bool is_system_error_codes_valid=9;
+        LocationData location_data=10;                                          // 由定位反馈的gps数据，它是由车辆坐标点转换过来的数据
+    }
+    Payload payload = 2;
+    bytes car_id = 3;
+    int64 timestamp = 4;
+    bytes task_id=5;
+    bytes main_task_id=6;
+}

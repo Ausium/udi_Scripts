@@ -1,0 +1,165 @@
+syntax = "proto3";
+
+package Net2;
+
+// 车辆数据发布 ID: 45
+// 车端->网端
+// 1hz 频率发布
+message CarData {
+    uint32 class_id = 1;                                                        // id 45
+    message Payload {
+        uint32 chassis_version = 1;                                             // 车辆底盘类型
+                                                                                // 0 夸父3.3 夸父3.4
+                                                                                // 1 夸父mini3&3S
+                                                                                // 夸父3.5
+        message BoolWithCheck
+        {
+            bool data=1;
+            bool is_valid=2;
+        }
+        message  Uint8WithCheck
+        {
+            uint32 data=1;
+            bool  is_valid=2;
+        }
+        message Float32WithCheck
+        {
+            float data=1;                                           
+            bool is_valid=2;
+        }
+        message Float64WithCheck
+        {
+            double data=1;
+            bool is_valid=2;
+        }
+        message DrivingCmd
+        {
+            Uint8WithCheck chassis_control_mode_code=1;                         // 车辆控制模式反馈（综合vcu和ipc模式）
+                                                                                // 0 现场人工驾驶模式（仅在载人车上使用
+                                                                                // 1 现场VCU遥控模式
+                                                                                // 2 VCU空闲模式
+                                                                                // 3 现场IPC遥控模式
+                                                                                // 4 遥控脱困模式
+                                                                                // 5 网端远程驾驶模式
+                                                                                // 6 网端脱困模式
+                                                                                // 7 自动驾驶模式
+                                                                                // 8 IPC空闲模式
+            repeated uint32 chassis_control_mode_array=2;                       // 车辆控制模式数组　第一位：control unit　第二位：control source 第三位：control mode
+                                                                                // 0 控制单元:VCU
+                                                                                // 1 控制单元:IPC（工控机）
+                                                                                // 0 控制源: 人工驾驶（油门、刹车踏板及方向盘，仅在载人车上使用）
+                                                                                // 1 控制源: 遥控器
+                                                                                // 2 控制源: 网端平台
+                                                                                // 3 控制源: 自动驾驶算法
+                                                                                // 4 控制源: 无（对应空闲模式）
+                                                                                // 0 控制模式:　现场模式
+                                                                                // 1 控制模式:　自动模式
+                                                                                // 2 控制模式:　远程模式
+                                                                                // 3 控制模式:　脱困模式
+                                                                                // 9 控制模式:　空闲模式
+            Float32WithCheck speed_cmd=3;                                       // 速度 单位：km/h
+            Float32WithCheck steering_degree_cmd=4;                             // 舵机转角 单位: 度
+            Float32WithCheck brake_pressure_cmd=5;                              // 刹车压力比 单位: bar
+            Float32WithCheck motor_rpm_cmd=6;                                   // 电机转速 单位 转/分钟
+            repeated  Float32WithCheck data_reserved_float=7;                   // 保留位
+            repeated Uint8WithCheck data_reserved_int=8;                        // 保留位
+        }
+        message DrivingStatus
+        {
+            BoolWithCheck epb_status=1;                                         // 驻车情况 0:未驻车 1:驻车　
+            Uint8WithCheck system_error_status=2;                               // 系统错误情况（仅包含error/fatal）
+                                                                                // 0 无error/fatal，车辆可正常行驶
+                                                                                // 1 存在fatal,车辆不可行驶
+                                                                                // 2 存在error,车辆不可行驶
+                                                                                // 3 无error/fatal,但尚未人工解锁
+            Uint8WithCheck gear_status=3;                                       // 档位情况
+                                                                                // 0 空档
+                                                                                // 1 前进档
+                                                                                // 2 倒车档
+                                                                                // 3 停车档
+            Float32WithCheck speed_feedback=4;                                  // 速度反馈 单位：km/h
+            Float32WithCheck steering_degree_feedback=5;                        // 舵机转角反馈 单位： 度
+            Float32WithCheck brake_pressure_feedback=6;                         // 刹车压力比 单位: bar
+            Float32WithCheck back_left_wheel_speed_feedback=7;                  // 左后轮速度反馈 单位: km/h
+            Float32WithCheck back_right_wheel_speed_feedback=8;                 // 右后轮速度反馈 单位: km/h
+            Float32WithCheck motor_rpm_feedback=9;                              // 电机转速反馈 单位: 转/分钟
+            Float32WithCheck motor_torque_feedback=10;                          // 电机扭力反馈 单位 N*m
+            repeated Float32WithCheck data_reserved_float=11;                   // 保留位
+            repeated Uint8WithCheck data_reserved_int=12;                       // 保留位
+        }
+        message ChassisStatus
+        {
+            BoolWithCheck high_beam=1;                                          // 远光灯
+            BoolWithCheck low_beam=2;                                           // 近光灯
+            BoolWithCheck driving_lamp=3;                                       // 前进灯
+            BoolWithCheck brake_lamp=4;                                         // 刹车灯
+            BoolWithCheck back_driving_lamp=5;                                  // 倒车灯
+            BoolWithCheck outline_marker_lamp=6;                                // 轮廓灯
+            BoolWithCheck turn_left_lamp=7;                                     // 左转向灯
+            BoolWithCheck turn_right_lamp=8;                                    // 右转向灯
+            Float32WithCheck odometer=9;                                        // 累计里程 unit:km
+            Float32WithCheck  tripmeter=10;                                     // 小计里程 unit:km
+            Float32WithCheck left_front_tire_pressure=11;                       // 左前胎压 unit:kpa
+            Float32WithCheck right_front_tire_pressure=12;                      // 右前胎压 unit:kpa
+            Float32WithCheck left_rear_tire_pressure=13;                        // 左后胎压 unit:kpa
+            Float32WithCheck right_rear_tire_pressure=14;                       // 右后胎压 unit:kpa
+            Float32WithCheck left_front_tire_temperature=15;                    // 左前胎温 uint: °C
+            Float32WithCheck right_front_tire_temperature=16;                   // 右前胎温 uint: °C
+            Float32WithCheck left_rear_tire_temperature=17;                     // 左后胎温 uint: °C
+            Float32WithCheck right_rear_tire_temperature=18;                    // 右后胎温 uint: °C
+            repeated Float32WithCheck data_reserved_float=19;                   // 预留
+            repeated Uint8WithCheck data_reserved_int=20;                       // 数组data_reserved_int的第一个元素，作为前大灯的模式反馈，0 自动 1手动
+        }
+        message PowerSystem
+        {
+            BoolWithCheck charge_status=1;                                      // 充电状态 0:不在充电　１:充电中
+            BoolWithCheck charge_wire_status=2;                                 // 充电线缆连接状态　0: 未连接　1: 已连接 (只有夸父有，易咖车这个数据的有效性会一直为false)
+            Float32WithCheck battery_soc=3;                                     // 电池电量   uint: %
+            Float32WithCheck battery_voltage=4;                                 // 电池电压   uint: V
+            Float32WithCheck battery_current=5;                                 // 电池电流   uint: A
+            Float32WithCheck charger_output_voltage=6;                          // 充电机输出电压  uint: V (只有夸父有，易咖车这个数据的有效性会一直为false)
+            Float32WithCheck charger_output_current=7;                          // 充电机输出电流  uint: A (只有夸父有，易咖车这个数据的有效性会一直为false)
+            repeated Float32WithCheck data_reserved_float=8;                    // 预留
+            repeated Uint8WithCheck data_reserved_int=9;                        // 预留
+        }
+        message GpsData
+        {
+            BoolWithCheck gps_fix_status=1;                                     // GPS定位状态
+            Float64WithCheck latitude=2;                                        // 经度
+            Float64WithCheck longitude=3;                                       // 纬度
+            Float64WithCheck altitude=4;                                        // 海拔高度
+            Float64WithCheck heading_degree=5;                                  // 朝向（方位角） uint: °，正北0度，正东90度
+            repeated Float32WithCheck data_reserved_float=6;                    // reserved
+            repeated Uint8WithCheck data_reserved_int=7;                        // reserved
+        }
+        message UnifiedErrorCode
+        {
+            bytes error_code=1;                                                 // 故障码
+            uint32 error_rank=2;                                                // 故障等级
+        }
+        message LocationData
+        {
+            BoolWithCheck is_location_data_valid=1;                             // 定位反馈数据是否有效
+            Float64WithCheck latitude=2;                                        // 经度
+            Float64WithCheck longitude=3;                                       // 纬度
+            Float64WithCheck altitude=4;                                        // 海拔高度
+            Float64WithCheck heading_degree=5;                                  // 朝向（方位角） uint: °，正北0度，正东90度
+            repeated Float32WithCheck data_reserved_float=6;                    // reserved
+            repeated Uint8WithCheck data_reserved_int=7;                        // reserved
+        }
+        DrivingCmd driving_cmd = 2;                                             // 车辆行驶相关指令
+        DrivingStatus driving_status=3;                                         // 车辆行驶状态反馈
+        ChassisStatus chassis_status=4;                                         // 车辆底盘反馈数据
+        PowerSystem power_system_status=5;                                      // 车辆电源系统反馈数据
+        GpsData gps_data=6;                                                     // 车辆gps反馈数据
+        repeated UnifiedErrorCode error_codes=7;                                // 车辆反馈故障码
+        bool is_hardware_error_codes_valid=8;                                   // 硬件故障码有效
+        bool is_system_error_codes_valid=9;                                     // 系统故障码有效
+        LocationData location_data=10;                                          // 由定位反馈的gps数据，它是由车辆坐标点转换过来的数据
+    }
+    Payload payload = 2;
+    bytes car_id = 3;                                                           // 车辆id
+    int64 timestamp = 4;                                                        // 接受的ros消息车端时间戳，单位: ms
+    bytes task_id=5;                                                            // 子任务id
+    bytes main_task_id=6;                                                       // 主任务id
+}     

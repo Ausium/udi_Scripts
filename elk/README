@@ -1,0 +1,7 @@
+nginx日志分析脚本：
+从es的接口中获取nginx日志的相关数据，再通过pyecharts绘制成图表，再将html图表转成jpeg的图片，最后通过Email将html文件发送给大家
+1. 需要下载一个无头浏览器phantomjs 下载地址：https://phantomjs.org/download.html
+2. 需要下载echarts的js文件，下载地址：https://assets.pyecharts.org/assets/echarts.min.js
+
+更新内容：
+  1. 直接使用elasticsearch的库连接es，从es中取数据。速度会更快，时间跨度也可以更大。
